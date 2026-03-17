@@ -555,3 +555,21 @@ class AppConfig(BaseSettings):
 
 # Global app configuration instance
 app_config = AppConfig()
+# src/landppt/core/config.py
+
+class AppConfig(BaseSettings):
+    host: str = Field(default="0.0.0.0", env="HOST")
+    port: int = Field(default=8000, env="PORT")
+    debug: bool = Field(default=True, env="DEBUG")
+    reload: bool = Field(default=True, env="RELOAD")
+
+    database_url: str = Field(
+        default="sqlite:///./landppt.db",
+        env="DATABASE_URL"
+    )
+    async_database_url: str | None = Field(
+        default=None,
+        env="ASYNC_DATABASE_URL"
+    )
+
+    secret_key: str = Field(default="your-secret-key-here", env="SECRET_KEY")

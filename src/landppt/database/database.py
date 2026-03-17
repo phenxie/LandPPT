@@ -11,14 +11,25 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from ..core.config import app_config
 
 # Create database URL
+# DATABASE_URL = app_config.database_url
+
+# # For async SQLite, we need to use aiosqlite
+# if DATABASE_URL.startswith("sqlite:///"):
+#     ASYNC_DATABASE_URL = DATABASE_URL.replace("sqlite:///", "sqlite+aiosqlite:///")
+# else:
+#     ASYNC_DATABASE_URL = DATABASE_URL
+# src/landppt/database/database.py
+
 DATABASE_URL = app_config.database_url
 
-# For async SQLite, we need to use aiosqlite
-if DATABASE_URL.startswith("sqlite:///"):
+if getattr(app_config, "async_database_url", None):
+    ASYNC_DATABASE_URL = app_config.async_database_url
+elif DATABASE_URL.startswith("sqlite:///"):
     ASYNC_DATABASE_URL = DATABASE_URL.replace("sqlite:///", "sqlite+aiosqlite:///")
+elif DATABASE_URL.startswith("mysql+pymysql://"):
+    ASYNC_DATABASE_URL = DATABASE_URL.replace("mysql+pymysql://", "mysql+aiomysql://", 1)
 else:
     ASYNC_DATABASE_URL = DATABASE_URL
-
 # Create engines
 # SQLite-specific configuration for better concurrency
 sqlite_connect_args = {
